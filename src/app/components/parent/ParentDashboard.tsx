@@ -83,8 +83,10 @@ export function ParentDashboard({ parentName = 'Maya' }: ParentDashboardProps) {
                         <CardTitle className="text-xl">{student.name}</CardTitle>
                         <p className="text-sm text-gray-600 mt-1">Grade {student.grade}</p>
                       </div>
-                      <div className="w-12 h-12 rounded-full bg-[#326389] bg-opacity-10 flex items-center justify-center">
-                        <GraduationCap className="w-6 h-6 text-[#326389]" />
+                      <div className="w-12 h-12 rounded-full bg-[#326389] flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-sm">
+                          {student.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                        </span>
                       </div>
                     </div>
                   </CardHeader>

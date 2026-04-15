@@ -90,7 +90,7 @@ const FALLBACK_CLASSES: ClassData[] = [
 ];
 
 export default function App() {
-  const [stage, setStage] = useState<Stage>(0);
+  const [stage, setStage] = useState<Stage>(1);
   const [completedStages, setCompletedStages] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState<RegistrationSession>({
@@ -122,6 +122,15 @@ export default function App() {
 
   // Load classes from backend on mount
   useEffect(() => {
+    // In dev mode there is no Velo backend — use fallback data immediately
+    if (import.meta.env.DEV) {
+      const timer = setTimeout(() => {
+        setAllClasses(FALLBACK_CLASSES);
+        setIsLoading(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+
     async function initClasses() {
       setIsLoading(true);
       try {
@@ -145,7 +154,7 @@ export default function App() {
         setAllClasses(formattedClasses);
       } catch (err) {
         toast.error('Failed to load classes from backend');
-        setAllClasses(FALLBACK_CLASSES); // Use fallback data
+        setAllClasses(FALLBACK_CLASSES);
       } finally {
         setIsLoading(false);
       }
@@ -261,6 +270,9 @@ export default function App() {
       const siblingDiscount = studentsWithClasses > 1 ? subtotal * 0.1 : 0;
 
       try {
+        // In dev mode there is no Velo backend — skip the RPC call and fall through to local calc
+        if (import.meta.env.DEV) throw new Error('dev');
+
         // Get authoritative pricing from backend
         const cartData = {
           students: session.students.map(s => ({
@@ -456,33 +468,37 @@ export default function App() {
       paymentMethod,
     });
 
-    // Simulate payment success after 2 seconds
-    setTimeout(() => {
-      const mockConfirmation: EnrollmentConfirmedEvent = {
-        confirmationNumber: 'CONF-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-        receiptURL: '#',
-        transactionId: 'TXN-' + Math.random().toString(36).substring(2, 15).toUpperCase(),
-        studentNames: session.students.map((s) => `${s.firstName} ${s.lastName}`),
-        classNames: session.students.flatMap((s) =>
-          s.selectedClasses.map((sc) => {
-            const cls = allClasses.find((c) => c.id === sc.classId);
-            return cls?.title || '';
-          })
-        ),
-        totalPaid: paymentMethod === 'full' ? cartSummary.total : cartSummary.registrationFee + cartSummary.materialsFee + cartSummary.lastMonthTuition,
-        paymentMethod: paymentMethod === 'full' ? 'Paid in Full' : 'Monthly Payment Plan',
-        date: new Date().toISOString(),
-      };
+    if (import.meta.env.DEV) {
+      // Simulate payment success after 2 seconds in DEV mode
+      setTimeout(() => {
+        const mockConfirmation: EnrollmentConfirmedEvent = {
+          confirmationNumber: 'CONF-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+          receiptURL: '#',
+          transactionId: 'TXN-' + Math.random().toString(36).substring(2, 15).toUpperCase(),
+          studentNames: session.students.map((s) => `${s.firstName} ${s.lastName}`),
+          classNames: session.students.flatMap((s) =>
+            s.selectedClasses.map((sc) => {
+              const cls = allClasses.find((c) => c.id === sc.classId);
+              return cls?.title || '';
+            })
+          ),
+          totalPaid: paymentMethod === 'full' ? cartSummary.total : cartSummary.registrationFee + cartSummary.materialsFee + cartSummary.lastMonthTuition,
+          paymentMethod: paymentMethod === 'full' ? 'Paid in Full' : 'Monthly Payment Plan',
+          date: new Date().toISOString(),
+        };
 
-      setEnrollmentConfirmation(mockConfirmation);
-      setStage('success');
+        setEnrollmentConfirmation(mockConfirmation);
+        setStage('success');
 
-      emitToVelo.paymentSuccess({
-        stripeSessionId: 'stripe_' + Date.now(),
-        studentIds: session.students.map((s) => s.id),
-        classIds: session.students.flatMap((s) => s.selectedClasses.map((sc) => sc.classId)),
-      });
-    }, 2000);
+        emitToVelo.paymentSuccess({
+          stripeSessionId: 'stripe_' + Date.now(),
+          enrollments: session.students.map((s) => ({
+            studentId: s.id,
+            classIds: s.selectedClasses.map((sc) => sc.classId),
+          })),
+        });
+      }, 2000);
+    }
   };
 
   const handleCapacityExpired = (classId: string) => {
@@ -527,7 +543,7 @@ export default function App() {
   const currentStudent = session.students[currentStudentIndex];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 w-full">
         {/* Progress Tracker */}
         <ProgressTracker
           currentStage={stage}
@@ -554,16 +570,18 @@ export default function App() {
             onContinue={async () => {
               setIsLoading(true);
               try {
-                await submitRegistration(
-                  { email: session.email, wixMemberId: session.parentId },
-                  session.students.map(s => ({
-                    firstName: s.firstName,
-                    lastName: s.lastName,
-                    dob: s.dob,
-                    grade: s.grade,
-                    medicalNotes: s.medicalNotes,
-                  }))
-                );
+                if (!import.meta.env.DEV) {
+                  await submitRegistration(
+                    { email: session.email, wixMemberId: session.parentId },
+                    session.students.map(s => ({
+                      firstName: s.firstName,
+                      lastName: s.lastName,
+                      dob: s.dob,
+                      grade: s.grade,
+                      medicalNotes: s.medicalNotes,
+                    }))
+                  );
+                }
                 completeStageAndMoveTo(1, 2);
               } catch (err) {
                 toast.error('Failed to sync student data. Please try again.');

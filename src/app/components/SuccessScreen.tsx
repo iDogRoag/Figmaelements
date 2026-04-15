@@ -16,7 +16,7 @@ export function SuccessScreen({
   onGoToDashboard,
 }: SuccessScreenProps) {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="w-full bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Success Icon */}
         <div className="text-center mb-8">

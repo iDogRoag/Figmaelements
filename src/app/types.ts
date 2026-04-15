@@ -135,9 +135,8 @@ export interface PaymentInitiateEvent {
 }
 
 export interface PaymentSuccessEvent {
-  stripeSessionId: string;
-  studentIds: string[];
-  classIds: string[];
+  stripeSessionId?: string;
+  enrollments: Array<{ studentId: string; classIds: string[] }>;
 }
 
 // Velo Custom Events - Velo Emits

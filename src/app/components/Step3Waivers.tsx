@@ -141,6 +141,10 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
   const [agreedCancellation, setAgreedCancellation] = useState(false);
   const [agreedPhotoRelease, setAgreedPhotoRelease] = useState(false);
 
+  const [hasCodeOfConductSig, setHasCodeOfConductSig] = useState(false);
+  const [hasCancellationSig, setHasCancellationSig] = useState(false);
+  const [hasPhotoReleaseSig, setHasPhotoReleaseSig] = useState(false);
+
   const codeOfConductSigRef = useRef<SignatureCanvas>(null);
   const cancellationSigRef = useRef<SignatureCanvas>(null);
   const photoReleaseSigRef = useRef<SignatureCanvas>(null);
@@ -153,9 +157,9 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
       fullNameCodeOfConduct.trim() &&
       fullNameCancellation.trim() &&
       fullNamePhotoRelease.trim() &&
-      !codeOfConductSigRef.current?.isEmpty() &&
-      !cancellationSigRef.current?.isEmpty() &&
-      !photoReleaseSigRef.current?.isEmpty()
+      hasCodeOfConductSig &&
+      hasCancellationSig &&
+      hasPhotoReleaseSig
     );
   };
 
@@ -182,7 +186,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="w-full bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <button
@@ -272,6 +276,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
               <div className="border-2 border-gray-300 rounded-lg bg-white">
                 <SignatureCanvas
                   ref={codeOfConductSigRef}
+                  onEnd={() => setHasCodeOfConductSig(true)}
                   canvasProps={{
                     className: 'w-full h-32 rounded-lg',
                   }}
@@ -282,7 +287,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
                 variant="ghost"
                 size="sm"
                 className="mt-2"
-                onClick={() => codeOfConductSigRef.current?.clear()}
+                onClick={() => { codeOfConductSigRef.current?.clear(); setHasCodeOfConductSig(false); }}
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Clear Signature
@@ -340,6 +345,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
               <div className="border-2 border-gray-300 rounded-lg bg-white">
                 <SignatureCanvas
                   ref={cancellationSigRef}
+                  onEnd={() => setHasCancellationSig(true)}
                   canvasProps={{
                     className: 'w-full h-32 rounded-lg',
                   }}
@@ -350,7 +356,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
                 variant="ghost"
                 size="sm"
                 className="mt-2"
-                onClick={() => cancellationSigRef.current?.clear()}
+                onClick={() => { cancellationSigRef.current?.clear(); setHasCancellationSig(false); }}
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Clear Signature
@@ -408,6 +414,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
               <div className="border-2 border-gray-300 rounded-lg bg-white">
                 <SignatureCanvas
                   ref={photoReleaseSigRef}
+                  onEnd={() => setHasPhotoReleaseSig(true)}
                   canvasProps={{
                     className: 'w-full h-32 rounded-lg',
                   }}
@@ -418,7 +425,7 @@ export function Step3Waivers({ students, onWaiversSigned, onContinue, onBack }: 
                 variant="ghost"
                 size="sm"
                 className="mt-2"
-                onClick={() => photoReleaseSigRef.current?.clear()}
+                onClick={() => { photoReleaseSigRef.current?.clear(); setHasPhotoReleaseSig(false); }}
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Clear Signature

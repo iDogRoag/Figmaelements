@@ -60,17 +60,24 @@ export function Overview() {
   });
 
   useEffect(() => {
+    if (import.meta.env.DEV) {
+      const timer = setTimeout(() => {
+        setStatsData({ totalStudents: 8, activeClasses: 4, totalRevenue: 14400, pendingAutopay: 1627 });
+        setIsLoading(false);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+
     async function loadData() {
       setIsLoading(true);
       try {
-        const data = await getAdminOverview(); // Get everything in one call
+        const data = await getAdminOverview();
         setStatsData({
           totalStudents: data.totalStudents,
           activeClasses: data.activeClasses,
           totalRevenue: data.totalRevenue,
           pendingAutopay: data.pendingAutopay,
         });
-        // Student roster data available in data.students if needed for future features
       } catch (error) {
         console.error('Failed to load admin overview:', error);
       } finally {

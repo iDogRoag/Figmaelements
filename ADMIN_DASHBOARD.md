@@ -73,10 +73,6 @@ src/app/
   - Grade badge
   - Proficiency badge (Speaker/Non-Speaker)
   - Enrollment progress bar
-  - Kebab menu (3-dot) with actions:
-    - Edit Class
-    - Duplicate
-    - Delete
 
 **Mock Data**:
 ```typescript
@@ -411,7 +407,7 @@ function Root() {
 
 ### **Completed**
 - ✅ Admin layout with sidebar navigation
-- ✅ Class Manager view with card grid
+- ✅ Class Manager view with card grid (kebab menu removed for launch)
 - ✅ Create Class modal with full form
 - ✅ Financial Settings view
 - ✅ Global Fees card with all inputs
@@ -425,31 +421,40 @@ function Root() {
 - ✅ Form validation (React Hook Form)
 - ✅ Responsive design
 - ✅ Mock data for development
+- ✅ Live Roster view with search/filter/export (mock data, loads in 800ms)
+- ✅ Wix Custom Element bundle (single `tnhp-bundle.js`, 184 KB gzipped)
+- ✅ Event-based RPC layer (`wixService.ts` + `attributeChangedCallback`)
+- ✅ Step 1B accordion form (collapsible sections, emergency contacts pre-expanded)
 
-### **Future Enhancements**
-- ⏳ Edit Class functionality (currently "Edit" in menu)
-- ⏳ Duplicate Class functionality
-- ⏳ Dashboard view (analytics, stats)
-- ⏳ Rosters view (student lists per class)
-- ⏳ Settings view (admin preferences)
-- ⏳ Search & filters for class list
-- ⏳ Pagination for large datasets
-- ⏳ Bulk actions (select multiple, delete all)
-- ⏳ Export to CSV/PDF
-- ⏳ Velo backend integration
-- ⏳ Real-time updates (WebSocket/polling)
-- ⏳ Audit logs (who changed what)
-- ⏳ Role-based permissions
+### **Phase 4 — Family Dashboard** (Next)
+- ⏳ Connect ParentDashboard to live `getFamilyDashboardData` Wix RPC call
+- ⏳ Wix Members auth integration (pass `memberId` to Custom Element)
+- ⏳ Real document download URLs from Wix Media
+
+### **Phase 5 — Autopay Engine**
+- ⏳ Velo `jobs.config` cron job — charge saved cards on the 6th of each month
+- ⏳ Payment failure handling & retry logic
+- ⏳ Autopay toggle UI in Parent Dashboard
+
+### **Phase 6 — Admin Wiring**
+- ⏳ Connect Class Manager create/edit to Wix CMS
+- ⏳ Connect Rosters to live `getAdminOverview` Wix RPC
+- ⏳ Connect Financial Settings to Wix CMS Courses collection
+- ⏳ Edit & Duplicate class functionality
+
+### **Phase 7 — QA & Launch (Target: April 8, 2026)**
+- ⏳ End-to-end sandbox tests: multi-child carts, early-bird thresholds
+- ⏳ Payment failure scenarios
+- ⏳ Mobile responsive QA pass
+- ⏳ Upload `tnhp-bundle.js` to Wix, configure Custom Elements in Editor
 
 ---
 
 ## 🐛 Known Limitations (MVP)
 
 1. **No Data Persistence**: Refreshing page loses changes
-2. **No Edit Flow**: "Edit Class" menu item does nothing yet
-3. **No Duplicate**: "Duplicate Class" menu item does nothing yet
-4. **No Delete Class**: Delete in kebab menu not wired up
-5. **No Search/Filter**: Class list shows all items
+2. **No Edit/Delete Class**: Not wired up for launch (Phase 6)
+3. **No Search/Filter on Class List**: Class Manager shows all items
 6. **No Pagination**: Assumes small dataset
 7. **Static Teacher List**: Hardcoded names, not dynamic
 8. **No Validation on Backend**: Client-side only

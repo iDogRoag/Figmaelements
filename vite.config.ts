@@ -1,36 +1,35 @@
-import { defineConfig } from 'vite'
-import path from 'path'
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
-
-
-function figmaAssetResolver() {
-  return {
-    name: 'figma-asset-resolver',
-    resolveId(id) {
-      if (id.startsWith('figma:asset/')) {
-        const filename = id.replace('figma:asset/', '')
-        return path.resolve(__dirname, 'src/assets', filename)
-      }
-    },
-  }
-}
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 export default defineConfig({
   plugins: [
-    figmaAssetResolver(),
-    // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
     react(),
-    tailwindcss(),
+    tailwindcss(), // Processes Tailwind v4 @import directives (required for both dev and prod)
+    cssInjectedByJsPlugin(), // Injects compiled CSS into the JS bundle (prod: no separate .css file)
   ],
-  resolve: {
-    alias: {
-      // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
+  build: {
+    lib: {
+      entry: 'src/wix-entry.tsx',
+      name: 'TNHPComponents',
+      formats: ['es'],
+      fileName: () => 'tnhp-bundle.js',
     },
+    rollupOptions: {
+      // We are deliberately NOT externalizing React or ReactDOM.
+      // We want them bundled inside so Wix doesn't have to load them separately.
+      output: {
+        inlineDynamicImports: true,
+        // Wix's ESLint linter runs no-undef on the bundle and fails deployment
+        // if browser/React globals are unrecognised. This banner disables that.
+        banner: '/* eslint-disable */',
+      },
+    },
+    emptyOutDir: true,
   },
-
-  // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
-  assetsInclude: ['**/*.svg', '**/*.csv'],
-})
+  define: {
+    // Required for React to compile in production mode within a Custom Element
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  },
+});

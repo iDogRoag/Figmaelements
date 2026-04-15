@@ -1,13 +1,7 @@
 import { useState } from 'react';
-import { Plus, MoreVertical, Clock, MapPin, Users, GraduationCap } from 'lucide-react';
+import { Plus, Clock, MapPin, Users, GraduationCap } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
 import { CreateClassModal } from './CreateClassModal';
 
 interface Class {
@@ -117,20 +111,6 @@ export function ClassManager() {
                   </h3>
                   <p className="text-sm text-gray-600">{classItem.teacher}</p>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreVertical className="w-5 h-5 text-gray-600" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit Class</DropdownMenuItem>
-                    <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
 
               {/* Details */}

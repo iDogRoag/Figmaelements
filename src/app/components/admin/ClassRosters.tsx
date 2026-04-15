@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { getAdminOverview } from '../../../services/wixService';
 
 type PaymentStatus = 'paid' | 'pending' | 'overdue';
 
@@ -131,32 +130,11 @@ export function ClassRosters() {
   const [filterPayment, setFilterPayment] = useState('all');
 
   useEffect(() => {
-    async function loadRoster() {
-      setIsLoading(true);
-      try {
-        const data = await getAdminOverview(); // Get everything in one call
-        // Map backend student data to frontend roster structure
-        const formattedRoster: RosterStudent[] = data.students.map((student, index) => ({
-          id: student._id,
-          name: student.title,
-          grade: student.grade || '1',
-          class: student.classes[0] || 'Unassigned',
-          teacher: student.teacher || 'TBD',
-          paymentStatus: (student.payment?.toLowerCase() || 'pending') as PaymentStatus,
-          hasMedicalAlert: student.medical || false,
-          medicalNotes: student.medical ? 'See student record for details' : undefined,
-          parentEmail: `parent@${student.title.split(' ')[1]?.toLowerCase() || 'family'}.com`,
-        }));
-        // Merge backend data with fallback data for demo purposes
-        setRosterData([...formattedRoster, ...FALLBACK_ROSTER]);
-      } catch (error) {
-        console.error('Failed to load roster:', error);
-        setRosterData(FALLBACK_ROSTER);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadRoster();
+    const timer = setTimeout(() => {
+      setRosterData(FALLBACK_ROSTER);
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleExportCSV = () => {
