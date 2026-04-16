@@ -3,9 +3,9 @@ import { createRoot, Root } from 'react-dom/client';
 import RegistrationFlow from './app/RegistrationFlow';
 import { ParentApp } from './app/components/parent/ParentApp';
 import { AdminApp } from './app/components/admin/AdminApp';
-import './styles/index.css'; // Ensures Tailwind is included in the bundle
+import styles from './styles/index.css?inline'; // Includes raw CSS string for Shadow DOM
 
-// Helper function to wrap React components in Standard Web Components (Light DOM)
+// Helper function to wrap React components in Standard Web Components
 function createWixCustomElement(Component: React.FC, componentName: string) {
   return class extends HTMLElement {
     private root: Root | null = null;
@@ -44,10 +44,16 @@ function createWixCustomElement(Component: React.FC, componentName: string) {
         this.mountPoint.style.height = '100%';
         this.mountPoint.className = 'tnhp-root-container';
         
-        // Clear debug text
-        this.mountPoint.innerHTML = '';
+        // Create Shadow DOM to isolate styles from Wix site styles
+        const shadow = this.attachShadow({ mode: 'open' });
         
-        this.appendChild(this.mountPoint);
+        // Inject Tailwind CSS directly into Shadow DOM
+        const styleElement = document.createElement('style');
+        styleElement.textContent = styles;
+        shadow.appendChild(styleElement);
+        
+        // Append mount point
+        shadow.appendChild(this.mountPoint);
       }
 
       // Relay events from window down to this Custom Element so Velo can listen to them

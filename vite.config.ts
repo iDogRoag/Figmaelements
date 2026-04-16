@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(), // Processes Tailwind v4 @import directives (required for both dev and prod)
-    cssInjectedByJsPlugin(), // Injects compiled CSS into the JS bundle (prod: no separate .css file)
   ],
   build: {
     lib: {
