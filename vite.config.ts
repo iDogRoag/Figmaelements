@@ -13,7 +13,7 @@ export default defineConfig({
     lib: {
       entry: 'src/wix-entry.tsx',
       name: 'TNHPComponents',
-      formats: ['es'],
+      formats: ['iife'],
       fileName: () => 'tnhp-bundle.js',
     },
     rollupOptions: {
