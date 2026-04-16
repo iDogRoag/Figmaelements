@@ -94,6 +94,11 @@ function createWixCustomElement(Component: React.FC, componentName: string) {
 }
 
 // Register the three elements for Wix
-customElements.define('tnhp-registration', createWixCustomElement(RegistrationFlow, 'Registration'));
+const RegistrationElement = createWixCustomElement(RegistrationFlow, 'Registration');
+customElements.define('tnhp-registration', RegistrationElement);
+// Also register the misspelled variant because the Wix Editor has it saved with this typo
+if (!customElements.get('tnhp-reistration')) {
+  customElements.define('tnhp-reistration', class extends RegistrationElement {});
+}
 customElements.define('tnhp-parent', createWixCustomElement(ParentApp, 'ParentPortal'));
 customElements.define('tnhp-admin', createWixCustomElement(AdminApp, 'AdminDashboard'));
